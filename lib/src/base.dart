@@ -29,6 +29,7 @@ class FlutterWebviewPlugin {
   final _onScrollXChanged = StreamController<double>.broadcast();
   final _onScrollYChanged = StreamController<double>.broadcast();
   final _onHttpError = StreamController<WebViewHttpError>.broadcast();
+  final _onPostMessage = StreamController<String>.broadcast();
 
   Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
@@ -54,6 +55,9 @@ class FlutterWebviewPlugin {
       case 'onHttpError':
         _onHttpError.add(WebViewHttpError(call.arguments['code'], call.arguments['url']));
         break;
+      case 'onPostMessage':
+        _onPostMessage.add(call.arguments['postMessage']);
+        break;
     }
   }
 
@@ -75,6 +79,8 @@ class FlutterWebviewPlugin {
   Stream<double> get onScrollXChanged => _onScrollXChanged.stream;
 
   Stream<WebViewHttpError> get onHttpError => _onHttpError.stream;
+
+  Stream<String> get onPostMessage => _onPostMessage.stream;
 
   /// Start the Webview with [url]
   /// - [headers] specify additional HTTP headers
@@ -188,6 +194,7 @@ class FlutterWebviewPlugin {
     _onScrollXChanged.close();
     _onScrollYChanged.close();
     _onHttpError.close();
+    _onPostMessage.close();
     _instance = null;
   }
 
