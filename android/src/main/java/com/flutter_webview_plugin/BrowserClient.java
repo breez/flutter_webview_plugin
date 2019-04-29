@@ -5,6 +5,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.annotation.TargetApi;
+import android.os.Build;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +30,19 @@ public class BrowserClient extends WebViewClient {
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         Map<String, Object> data = new HashMap<>();
         data.put("url", url);
 
         FlutterWebviewPlugin.channel.invokeMethod("onUrlChanged", data);
+        String script = "if (!window.breezReceiveMessage) {" +
+                    "window.breezReceiveMessage = function(event) {Android.getPostMessage(event.data);};" +
+                    "window.addEventListener('message', window.breezReceiveMessage, false);" +
+                "}";
+        view.evaluateJavascript(script, null);
+
 
         data.put("type", "finishLoad");
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
