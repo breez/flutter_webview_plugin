@@ -282,10 +282,12 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    NSString* script = @"if (!window.breezReceiveMessage) {" +
-                @"window.breezReceiveMessage = function(event) {webkit.messageHandlers.postMessageHandler.postMessage(event.data);};" +
-                @"window.addEventListener('message', window.breezReceiveMessage, false);" +
-            @"}"
+    NSString* script = [NSString stringWithFormat:@"%@%@%@%@",
+                        @"if (!window.breezReceiveMessage) {",
+                        @"window.breezReceiveMessage = function(event) {webkit.messageHandlers.postMessageHandler.postMessage(event.data);};",
+                        @"window.addEventListener('message', window.breezReceiveMessage, false);",
+                        @"}"];
+                        
     [webView evaluateJavaScript:script completionHandler:^(id Result, NSError * error) {
         if (error != nil) {
             NSLog(@"Error in evaluating javascript -> %@", error);
