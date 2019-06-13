@@ -192,14 +192,10 @@ class WebviewManager {
 
     void takeScreenshot(MethodCall call, MethodChannel.Result result){
         if (webView != null) {
-            int bitmapHeight = (webView.getMeasuredHeight() < webView.getContentHeight())
-                    ? webView.getContentHeight() : webView.getMeasuredHeight();
-
-            Bitmap bitmap = Bitmap.createBitmap(
-                    webView.getMeasuredWidth(), bitmapHeight, Bitmap.Config.ARGB_8888);
-
-            Canvas canvas = new Canvas(bitmap);
-            webView.draw(canvas);
+            webView.enableSlowWholeDocumentDraw();
+            webView.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(webView.getDrawingCache());
+            webView.setDrawingCacheEnabled(false);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
