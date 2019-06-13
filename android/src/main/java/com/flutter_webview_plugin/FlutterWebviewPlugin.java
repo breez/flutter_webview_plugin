@@ -77,6 +77,9 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
             case "cleanCookies":
                 cleanCookies(call, result);
                 break;
+            case "takeScreenshot":
+                takeScreenshot(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -228,6 +231,13 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
             CookieManager.getInstance().removeAllCookie();
         }
         result.success(null);
+    }
+
+    private byte[] takeScreenshot(MethodCall call, MethodChannel.Result result) {
+        if (webViewManager != null) {
+            return webViewManager.takeScreenshot(call, result);
+        }
+        return null;
     }
 
     private int dp2px(Context context, float dp) {

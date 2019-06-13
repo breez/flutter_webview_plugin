@@ -17,6 +17,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -186,6 +188,27 @@ class WebviewManager {
         } else {
             CookieManager.getInstance().removeAllCookie();
         }
+    }
+
+    byte[] takeScreenshot(MethodCall call, MethodChannel.Result result){
+        if (webView != null) {
+            int bitmapHeight = (webView.getMeasuredHeight() < webView.getContentHeight())
+                    ? webView.getContentHeight() : webView.getMeasuredHeight();
+
+            Bitmap bitmap = Bitmap.createBitmap(
+                    webView.getMeasuredWidth(), bitmapHeight, Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(bitmap);
+            webView.draw(canvas);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            bitmap.recycle();
+            return byteArray;
+        }
+        return null;
+
     }
 
     private void clearCache() {
