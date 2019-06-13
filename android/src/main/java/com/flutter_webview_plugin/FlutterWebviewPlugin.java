@@ -233,11 +233,10 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
         result.success(null);
     }
 
-    private byte[] takeScreenshot(MethodCall call, MethodChannel.Result result) {
+    private void takeScreenshot(MethodCall call, MethodChannel.Result result) {
         if (webViewManager != null) {
-            return webViewManager.takeScreenshot(call, result);
+            webViewManager.takeScreenshot(call, result);
         }
-        return null;
     }
 
     private int dp2px(Context context, float dp) {

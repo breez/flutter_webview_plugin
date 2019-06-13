@@ -190,7 +190,7 @@ class WebviewManager {
         }
     }
 
-    byte[] takeScreenshot(MethodCall call, MethodChannel.Result result){
+    void takeScreenshot(MethodCall call, MethodChannel.Result result){
         if (webView != null) {
             int bitmapHeight = (webView.getMeasuredHeight() < webView.getContentHeight())
                     ? webView.getContentHeight() : webView.getMeasuredHeight();
@@ -205,10 +205,8 @@ class WebviewManager {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
             bitmap.recycle();
-            return byteArray;
+            result.success(byteArray);
         }
-        return null;
-
     }
 
     private void clearCache() {
