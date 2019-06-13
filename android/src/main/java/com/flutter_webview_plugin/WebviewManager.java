@@ -18,7 +18,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 
 import java.util.HashMap;
 import java.util.Map;
