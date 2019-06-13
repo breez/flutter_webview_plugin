@@ -21,7 +21,7 @@ import android.graphics.Bitmap;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
