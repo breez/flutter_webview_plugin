@@ -44,55 +44,38 @@ public class BrowserClient extends WebViewClient {
                 "}";
         view.evaluateJavascript(listenPostMessagesScript, null);
 
+        String includePromisePolyfill = "var promisePolyfill = document.createElement(\"script\");\n" +
+                "promisePolyfill.type = \"text/javascript\";\n" +
+                "promisePolyfill.src = \"https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js\";" +
+                "document.body.appendChild(promisePolyfill);";
+        view.evaluateJavascript(includePromisePolyfill, null);
+
         String includeWebLN =
-                        "var webLnLib = document.createElement(\"script\");\n" +
+                "var webLnLib = document.createElement(\"script\");\n" +
                         "webLnLib.type = \"text/javascript\";\n" +
                         "webLnLib.src = \"https://unpkg.com/webln@0.2.0/dist/webln.min.js\";\n" +
                         "document.body.appendChild(webLnLib);";
         view.evaluateJavascript(includeWebLN, null);
 
         String initWebLN =
-                        "var webln = {\n" +
+                "   var processedInvoices = [];\n"+
+                        "var lnLinkSearchInterval;\n" +
+                        "       var webln = {\n" +
                         "   enable: function () {\n" +
                         "       window.postMessage(JSON.stringify({ enable: true }));\n" +
                         "       return new Promise(function (resolve, reject) {resolve(true);});\n" +
                         "   },\n" +
                         "   sendPayment: function (paymentRequest) {\n" +
-                        "       window.postMessage(JSON.stringify({ uri: paymentRequest }));\n" +
-                        "       return new Promise(function (resolve, reject) { });\n" +
+                        //"       clearInterval(lnLinkSearchInterval);\n"+
+                        "       if(!processedInvoices.includes(paymentRequest)){\n"+
+                        "           window.postMessage(JSON.stringify({ uri: paymentRequest }));\n" +
+                        "           processedInvoices.push(paymentRequest);\n"+
+                        "           return new Promise(function (resolve, reject) { });\n" +
+                        "       }\n"+
                         "   },\n" +
                         "};\n" +
                         "setTimeout(function () { WebLN.requestProvider();},450);";
         view.evaluateJavascript(initWebLN, null);
-
-        String listenLNLinks =
-                        "setInterval(function () {\n" +
-                        "   var searchText = \"lnbc\";\n" +
-                        "   var aTags = document.getElementsByTagName(\"span\");\n" +
-                        "   var i;\n" +
-                        "   for (i = 0; i < aTags.length; i++) {\n" +
-                        "       if (aTags[i].textContent.indexOf(searchText) === 0) {\n" +
-                        "           webln.sendPayment(aTags[i].textContent);\n" +
-                        "       }\n" +
-                        "   }\n" +
-                        "   /* ------------------------- */\n" +
-                        "   aTags = document.getElementsByTagName(\"input\");\n" +
-                        "   for (i = 0; i < aTags.length; i++) {\n" +
-                        "       if (aTags[i].value.indexOf(searchText) === 0) {\n" +
-                        "           webln.sendPayment(aTags[i].value);\n" +
-                        "       }\n" +
-                        "   }\n" +
-                        "   /* ------------------------- */\n" +
-                        "   aTags = document.getElementsByTagName(\"a\");\n" +
-                        "   searchText = \"lightning:lnbc\";\n" +
-                        "   for (i = 0; i < aTags.length; i++) {\n" +
-                        "       var href = aTags[i].getAttribute('href') + '';\n" +
-                        "       if (href.indexOf(searchText) === 0) {\n" +
-                        "           webln.sendPayment(href.replace('lightning:', ''));\n" +
-                        "       }\n" +
-                        "   }\n" +
-                        "}, 500);";
-        view.evaluateJavascript(listenLNLinks, null);
 
         data.put("type", "finishLoad");
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
