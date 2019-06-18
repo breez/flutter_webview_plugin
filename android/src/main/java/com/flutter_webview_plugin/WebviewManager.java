@@ -360,6 +360,7 @@ class WebviewManager {
     void show(MethodCall call, MethodChannel.Result result) {
         if (webView != null) {
             webView.setVisibility(View.VISIBLE);
+            webView.requestLayout();
         }
     }
 
