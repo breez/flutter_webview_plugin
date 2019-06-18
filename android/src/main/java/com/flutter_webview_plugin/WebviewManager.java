@@ -192,15 +192,24 @@ class WebviewManager {
 
     void takeScreenshot(MethodCall call, MethodChannel.Result result){
         if (webView != null) {
-            webView.enableSlowWholeDocumentDraw();
-            webView.setDrawingCacheEnabled(true);
-            Bitmap bitmap = Bitmap.createBitmap(webView.getDrawingCache());
-            webView.setDrawingCacheEnabled(false);
+            float scale = webView.getScale();
+            int height = (int) (webView.getContentHeight() * scale + 0.5);
+            Bitmap bitmap = Bitmap.createBitmap(webView.getWidth(), height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            webView.draw(canvas);
+
+            // prevent IllegalArgumentException for createBitmap:
+            // y + height must be <= bitmap.height()
+            int scrollOffset = (webView.getScrollY() + webView.getMeasuredHeight() > bitmap.getHeight())
+                    ? bitmap.getHeight() : webView.getScrollY();
+            // Crop visible content
+            Bitmap resized = Bitmap.createBitmap(
+                    bitmap, 0, scrollOffset, bitmap.getWidth(), webView.getMeasuredHeight());
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            resized.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            bitmap.recycle();
+            resized.recycle();
             result.success(byteArray);
         }
     }
