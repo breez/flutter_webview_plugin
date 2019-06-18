@@ -374,7 +374,13 @@ class WebviewManager {
         public void getPostMessage(String value){
             Map<String, Object> postMessageMap = new HashMap<>();
             postMessageMap.put("postMessage", value);
-            FlutterWebviewPlugin.channel.invokeMethod("onPostMessage", postMessageMap);
+            final Map<String, Object> map = postMessageMap;
+            webView.post(new Runnable() {
+                @Override
+                public void run() {
+                    FlutterWebviewPlugin.channel.invokeMethod("onPostMessage", map);
+                }
+            });
         }
     }
 }
