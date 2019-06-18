@@ -44,39 +44,6 @@ public class BrowserClient extends WebViewClient {
                 "}";
         view.evaluateJavascript(listenPostMessagesScript, null);
 
-        String includePromisePolyfill = "var promisePolyfill = document.createElement(\"script\");\n" +
-                "promisePolyfill.type = \"text/javascript\";\n" +
-                "promisePolyfill.src = \"https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js\";" +
-                "document.body.appendChild(promisePolyfill);";
-        view.evaluateJavascript(includePromisePolyfill, null);
-
-        String includeWebLN =
-                "var webLnLib = document.createElement(\"script\");\n" +
-                        "webLnLib.type = \"text/javascript\";\n" +
-                        "webLnLib.src = \"https://unpkg.com/webln@0.2.0/dist/webln.min.js\";\n" +
-                        "document.body.appendChild(webLnLib);";
-        view.evaluateJavascript(includeWebLN, null);
-
-        String initWebLN =
-                "   var processedInvoices = [];\n"+
-                        "var lnLinkSearchInterval;\n" +
-                        "       var webln = {\n" +
-                        "   enable: function () {\n" +
-                        "       window.postMessage(JSON.stringify({ enable: true }));\n" +
-                        "       return new Promise(function (resolve, reject) {resolve(true);});\n" +
-                        "   },\n" +
-                        "   sendPayment: function (paymentRequest) {\n" +
-                        //"       clearInterval(lnLinkSearchInterval);\n"+
-                        "       if(!processedInvoices.includes(paymentRequest)){\n"+
-                        "           window.postMessage(JSON.stringify({ uri: paymentRequest }));\n" +
-                        "           processedInvoices.push(paymentRequest);\n"+
-                        "           return new Promise(function (resolve, reject) { });\n" +
-                        "       }\n"+
-                        "   },\n" +
-                        "};\n" +
-                        "setTimeout(function () { WebLN.requestProvider();},450);";
-        view.evaluateJavascript(initWebLN, null);
-
         data.put("type", "finishLoad");
         FlutterWebviewPlugin.channel.invokeMethod("onState", data);
 
