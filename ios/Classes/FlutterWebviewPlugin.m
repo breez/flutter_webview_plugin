@@ -69,6 +69,8 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     } else if ([@"reload" isEqualToString:call.method]) {
         [self reload];
         result(nil);
+    } else if ([@"takeScreenshot" isEqualToString:call.method]) {
+        [self takeScreenshot:result];    
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -191,6 +193,17 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
         NSDictionary *rect = call.arguments[@"rect"];
         CGRect rc = [self parseRect:rect];
         self.webview.frame = rc;
+    }
+}
+
+- (void) takeScreenshot:(FlutterResult)result {
+    if (self.webview != nil) {
+        UIGraphicsBeginImageContext(self.webview.bounds.size);
+        [self.webview.layer renderInContext: UIGraphicsGetCurrentContext()];
+        UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        NSData* data = UIImagePNGRepresentation(image);
+        result([FlutterStandardTypedData typedDataWithBytes:data]);
     }
 }
 
