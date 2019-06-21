@@ -1,6 +1,7 @@
 package com.flutter_webview_plugin;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -56,5 +57,30 @@ public class BrowserClient extends WebViewClient {
         data.put("url", request.getUrl().toString());
         data.put("code", Integer.toString(errorResponse.getStatusCode()));
         FlutterWebviewPlugin.channel.invokeMethod("onHttpError", data);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        final Uri uri = Uri.parse(url);
+        return handleUri(uri);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        final Uri uri = request.getUrl();
+        return handleUri(uri);
+    }
+
+    private boolean handleUri(final Uri uri) {
+        final String scheme = uri.getScheme();
+        if (scheme.equalsIgnoreCase("lightning")) {
+            // Returning true means that you need to handle what to do with the url
+            return true;
+        } else {
+            // Returning false means that you are going to load this url in the webView itself
+            return false;
+        }
     }
 }
